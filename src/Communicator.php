@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 class Communicator {
 
 	protected static $version = 'v1';
-	protected static $api_url= 'http://picahoo-api.local/v1';
+	protected static $api_url= 'http://picahooapi.test4you.in/api/v1';
 
 	private $password;
 	private $email;
