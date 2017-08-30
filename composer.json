@@ -1,6 +1,7 @@
 {
     "name": "ruchirkakkad/communicator",
     "description": "Communication system for picahoo systems",
+    "license" : "MIT",
     "authors": [
       {
           "name": "Weboccult Technologies",
