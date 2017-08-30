@@ -16,9 +16,9 @@ class Communicator {
 	public function __construct() {
 		$this->setDefaultConfiguration();
 		$data = $this->generateToken();
-		if($data['code'] != 200){
-			return $data;
-		}
+//		if($data['code'] != 200){
+//			return $data;
+//		}
 	}
 
 	/**
