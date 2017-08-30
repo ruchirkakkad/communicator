@@ -11,6 +11,9 @@
         "laravel/framework": "5.1.* || 5.2.* || 5.3.* || 5.4.*",
 		"php": "^5.5.9 || ^7.0"
     },
+   "require-dev": {
+     "guzzlehttp/guzzle": "^6.3"
+   },
     "autoload": {
         "psr-4": {
             "Picahoo\\Communication\\": "src/"
@@ -37,9 +40,6 @@
         "post-update-cmd": [
             "php artisan clear-compiled",
             "php artisan optimize"
-        ],
-        "post-create-project-cmd": [
-            "php artisan key:generate"
         ]
     },
     "config": {
