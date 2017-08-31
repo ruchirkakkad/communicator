@@ -6,11 +6,11 @@ class TokenInvalid extends \Exception
 {
 	protected $message;
 	protected $code;
-    protected $file;
-    protected $line;
+	protected $file;
+	protected $line;
 
 	public function __construct($message)
 	{
 		$this->message = $message;
-    }
+	}
 }
