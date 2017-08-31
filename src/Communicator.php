@@ -3,11 +3,12 @@
 namespace Picahoo\Communicator;
 
 use GuzzleHttp\Client;
+use Picahoo\Communicator\Interfaces\CommunicatorInterface;
 
-class Communicator {
+class Communicator implements CommunicatorInterface{
 
 	protected static $version = 'v1';
-	protected static $api_url= 'http://picahooapi.test4you.in/api/v1';
+	protected $api_url= 'http://picahooapi.test4you.in/api/v1';
 
 	private $password;
 	private $email;
@@ -15,27 +16,14 @@ class Communicator {
 
 	public function __construct() {
 		$this->setDefaultConfiguration();
-		$data = $this->generateToken();
-//		if($data['code'] != 200){
-//			return $data;
-//		}
+		$this->generateToken();
 	}
 
-	/**
-     * Set credential.
-     *
-     * @return void
-     */
 	private function setDefaultConfiguration(){
 		$this->email = config('communicator.email');
 		$this->password = config('communicator.password');
 	}
 
-	/**
-     * Get credential.
-     *
-     * @return array
-     */
 	public function getCredentials()
 	{
 		return [
@@ -50,14 +38,20 @@ class Communicator {
 		if($token){
 			return $token;
 		}
+		throw new \Exception('Token Generate Fail');
 		return '';
+	}
+
+	public function getApiUrl($url)
+	{
+		return $this->api_url.$url;
 	}
 
 	public function generateToken()
 	{
 		$client = new Client();
 		try{
-			$response = $client->request('post', 'picahoo-api.local/api/v1/user/authenticate',[
+			$response = $client->request('post', $this->getApiUrl('/user/authenticate'),[
 				'form_params' => [
 					'email' => $this->email,
 					'password' => $this->password
@@ -78,11 +72,6 @@ class Communicator {
 		return ['code' => 400,'message' => 'Token generate fail, enter valid credentials in config file!','status' => 'fail'];
 	}
 
-	/**
-     * Get Token.
-     *
-     * @return array
-     */
 	public function getToken()
 	{
 		return $this->token;
@@ -90,9 +79,10 @@ class Communicator {
 
 	public function getContactList()
 	{
+		$this->generateToken();
 		try{
 			$client = new Client();
-			$response = $client->request('get', 'picahoo-api.local/api/v1/user/contact/all',[
+			$response = $client->request('get', $this->getApiUrl('/user/contact/all'),[
 				'headers' => [
 			        'Authorization' => 'Bearer '.$this->token
 			    ]
@@ -107,9 +97,10 @@ class Communicator {
 
 	public function addContact($requestData)
 	{
+		$this->generateToken();
 		try{
 			$client = new Client();
-			$response = $client->request('post', 'picahoo-api.local/api/v1/user/contact/force-store',[
+			$response = $client->request('post', $this->getApiUrl('/user/contact/force-store'),[
 				'headers' => [
 			        'Authorization' => 'Bearer '.$this->token
 			    ],
@@ -154,11 +145,6 @@ class Communicator {
 		}
 	}
 
-	/**
-     * Get Token.
-     *
-     * @return array
-     */
 	public function sendEmail($to, $message, $subject)
 	{
 		$contact = $this->checkContactByEmail($to);
@@ -170,9 +156,10 @@ class Communicator {
 
 	public function sendEmailByContactId($contactId,$message, $subject)
 	{
+		$this->generateToken();
 		try{
 			$client = new Client();
-			$response = $client->request('post', 'picahoo-api.local/api/v1/mandrill/send',[
+			$response = $client->request('post', $this->getApiUrl('/mandrill/send'),[
 				'headers' => [
 			        'Authorization' => 'Bearer '.$this->token
 			    ],
@@ -215,6 +202,17 @@ class Communicator {
 		}
 		return $newList;
 	}
+
+
+	/**
+    * Convert the model to its string representation.
+    *
+    * @return string
+    */
+   public function __toString()
+   {
+       return $this->toJson();
+   }
 
 
 }
