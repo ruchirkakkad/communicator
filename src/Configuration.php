@@ -35,12 +35,14 @@ class Configuration
 	{
 		if(empty(config('communicator')) || empty(config('communicator.credential')) || empty(config('communicator.mail'))){
 			$this->config_status = false;
+		}else{
+			$this->version = config('communicator.version');
+			$this->api_url = config('communicator.api_url');
+			$this->email = config('communicator.credential.email');
+			$this->password = config('communicator.credential.password');
+			$this->mail_from_name = config('communicator.mail.mail_from_name');
+			$this->config_status = true;
 		}
-		$this->version = config('communicator.version');
-		$this->api_url = config('communicator.api_url');
-		$this->email = config('communicator.credential.email');
-		$this->password = config('communicator.credential.password');
-		$this->mail_from_name = config('communicator.mail.mail_from_name');
 	}
 
 	public function generateToken()

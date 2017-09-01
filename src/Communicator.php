@@ -19,6 +19,10 @@ class Communicator extends Configuration
 
 	public function getContactList()
 	{
+		if($check = $this->checkConfigAndToken()){
+			return $check;
+		}
+
 		$data = $this->request('get', [], ['Authorization' => 'Bearer ' . $this->token], $this->getApiUrl('/user/contact/all'));
 		if ($data['statusCode'] != 200) {
 			return [
@@ -39,6 +43,10 @@ class Communicator extends Configuration
 
 	private function addContact($requestData)
 	{
+		if($check = $this->checkConfigAndToken()){
+			return $check;
+		}
+
 		$data = $this->request('POST', [
 			"first_name" => $requestData['first_name'],
 			"last_name"  => $requestData['last_name'],
@@ -99,7 +107,9 @@ class Communicator extends Configuration
 
 	private function checkContactByEmail($email)
 	{
-
+		if($check = $this->checkConfigAndToken()){
+			return $check;
+		}
 		$contactResponse = $this->findContactByEmail($email);
 
 		if($contactResponse['code'] == 200){
@@ -118,6 +128,9 @@ class Communicator extends Configuration
 
 	public function sendEmail($to, $message, $subject)
 	{
+		if($check = $this->checkConfigAndToken()){
+			return $check;
+		}
 		$res = $this->checkContactByEmail($to);
 		if($res['code'] != 200){
 			return $res;
@@ -154,5 +167,27 @@ class Communicator extends Configuration
 		];
 	}
 
+	public function checkConfigAndToken()
+	{
+		if(!$this->config_status){
+			return [
+				'code'    => 400,
+				'message' => 'Your config file not set properly, please set config file.',
+				'status'  => 'fail',
+			    'body' => null
+			];
+		}
+
+		if(!$this->token_generated){
+			return [
+				'code'    => 400,
+				'message' => 'Token not provided',
+				'status'  => 'fail',
+			    'body' => null
+			];
+		}
+
+		return false;
+	}
 
 }
