@@ -1,6 +1,6 @@
-# Picahoo Communicator
+# Communicator
 
-Send SMS, Email, Whatsapp messages
+Send email
 
 # Requirements
 
@@ -10,7 +10,7 @@ Send SMS, Email, Whatsapp messages
 # Installation
 Require this package with composer
 ```
-composer require picahoo/communicator
+composer require ruchirkakkad/communicator
 ```
 
 Add service provider to your app/config.php providers array
@@ -33,12 +33,11 @@ use Communicator;
    ```
    or
    ```
-  "use Picahoo\Communicator\Facades\Communicator;"
+  use Picahoo\Communicator\Facades\Communicator;
   ```
   
 # Send email 
 ```
-    $response = Communicator::sendEmail('Email address', 'Message..', 'Subject here..');    
-    // return true and false
+    Communicator::sendEmail('Email address', 'Message..', 'Subject here..');    
 ```
 
