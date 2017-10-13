@@ -126,8 +126,28 @@ class Communicator extends Configuration
 		return $response;
 	}
 
-	public function sendEmail($to, $message, $subject)
+	public function sendEmail($to, $message, $subject,$attachments=[])
 	{
+		$attachmentTotalSize = 25;
+		$sendableAttachments = [];
+
+		if(count($attachments) > 0){
+			$actualFileSize = 0;
+			foreach ($attachments as $attachmentPath){
+				$sendableAttachments[]=[
+					'name' => pathinfo($attachmentPath, PATHINFO_BASENAME),
+					'type' => finfo_file(finfo_open(FILEINFO_MIME_TYPE), $attachmentPath),
+					'content' => base64_encode(file_get_contents($attachmentPath)),
+				];
+
+				$actualFileSize+= (floatval(filesize($attachmentPath)) / pow(1024, 2));
+			}
+
+			if(!($actualFileSize <= $attachmentTotalSize)){
+				return ['message' => 'attachment file size limit exceed, you upload under 25mb','status' => 'fail','code'	=> 404];
+			}
+		}
+
 		if($check = $this->checkConfigAndToken()){
 			return $check;
 		}
@@ -140,18 +160,30 @@ class Communicator extends Configuration
 			return ['message' => 'contact not exists in system','status' => 'fail','code' => 404];
 		}
 
-		return $this->sendEmailByContactId($res['contact']['id'], $message, $subject);
+		return $this->sendEmailByContactId($res['contact']['id'], $message, $subject,$sendableAttachments);
 	}
 
-	public function sendEmailByContactId($contactId, $message, $subject)
+	/*
+	 * @ contactId integer
+	 * @ message string
+	 * @sendableAttachments array ['name','type','content']
+	 *
+	 * */
+	public function sendEmailByContactId($contactId, $message, $subject,$sendableAttachments=[])
 	{
 		$data = $this->request('POST', [
 			"message"    => $message,
 			"contact_id" => $contactId,
-			"subject"    => $subject
+			"subject"    => $subject,
+		    "attachments" => $sendableAttachments
 		], ['Authorization' => 'Bearer ' . $this->token], $this->getApiUrl('/mandrill/send'));
 
 		if($data['statusCode'] != 200){
+
+			if($data['statusCode'] ==100 && isset($data['error_message'])){
+				$data['body'] = $data['error_message'];
+			}
+
 			return [
 				'message' => $data['body'],
 				'status'  => 'fail',
