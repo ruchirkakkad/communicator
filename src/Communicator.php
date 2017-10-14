@@ -163,6 +163,26 @@ class Communicator extends Configuration
 		return $this->sendEmailByContactId($res['contact']['id'], $message, $subject,$sendableAttachments);
 	}
 
+	public function sendSms($data = ['email' => '','phone' => ''], $message)
+	{
+		if($check = $this->checkConfigAndToken()){
+			return $check;
+		}
+		$res = $this->addContact([
+			"first_name" => null,
+			"last_name"  => null,
+			"email"      => $data['email'],
+			"phone"      => $data['phone']
+		]);
+
+		if($res['code'] != 200){
+			return $res;
+		}
+		if (empty($res) || !isset($res['contact']) && !isset($res['contact']['id'])) {
+			return ['message' => 'contact not exists in system','status' => 'fail','code' => 404];
+		}
+		return $this->sendSmsByContactId($res['contact']['id'], $message);
+	}
 	/*
 	 * @ contactId integer
 	 * @ message string
@@ -178,6 +198,40 @@ class Communicator extends Configuration
 		    "attachments" => $sendableAttachments
 		], ['Authorization' => 'Bearer ' . $this->token], $this->getApiUrl('/mandrill/send'));
 
+		if($data['statusCode'] != 200){
+
+			if($data['statusCode'] ==100 && isset($data['error_message'])){
+				$data['body'] = $data['error_message'];
+			}
+
+			return [
+				'message' => $data['body'],
+				'status'  => 'fail',
+				'code'    => $data['statusCode']
+			];
+		}
+
+		$res = json_decode($data['body'], true);
+		return [
+			'message' => $res['message'],
+			'status'  => 'ok',
+			'code'    => 200
+		];
+	}
+
+
+	/*
+	 * @ contactId integer
+	 * @ message string
+	 * @sendableAttachments array ['name','type','content']
+	 *
+	 * */
+	public function sendSmsByContactId($contactId, $message)
+	{
+		$data = $this->request('POST', [
+			"message"    => $message,
+			"contact_id" => $contactId
+		], ['Authorization' => 'Bearer ' . $this->token], $this->getApiUrl('/sms/send'));
 		if($data['statusCode'] != 200){
 
 			if($data['statusCode'] ==100 && isset($data['error_message'])){

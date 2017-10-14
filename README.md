@@ -1,6 +1,6 @@
 # Communicator
 
-Send email
+Send email & sms
 
 # Requirements
 
@@ -39,5 +39,11 @@ use Communicator;
 # Send email 
 ```
     Communicator::sendEmail('Email address', 'Message..', 'Subject here..');    
+```
+
+
+# Send sms 
+```
+    Communicator::sendSms(['email' => 'Email address','phone' => 'phone number'], 'Message..');    
 ```
 
