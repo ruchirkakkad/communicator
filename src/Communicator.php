@@ -71,20 +71,30 @@ class Communicator extends Configuration
 			    'contact' => null
 			];
 		}
-		return [
-			'code'    => 200,
-			'status'  => 'ok',
-			'message' => 'contact created',
-			'contact' => [
-				"id"         => $jsonObj['contact']['id'],
-				"user_id"    => $jsonObj['contact']['user_id'],
-				"first_name" => $jsonObj['contact']['first_name'],
-				"last_name"  => $jsonObj['contact']['last_name'],
-				"email"      => $jsonObj['contact']['email'],
-				"phone"      => $jsonObj['contact']['phone'],
-				"active"     => $jsonObj['contact']['active']
-			]
-		];
+
+		if(!empty($jsonObj['contact']) && isset($jsonObj['contact']['id'])){
+			return [
+				'code'    => 200,
+				'status'  => 'ok',
+				'message' => 'contact created',
+				'contact' => [
+					"id"         => $jsonObj['contact']['id'],
+					"user_id"    => $jsonObj['contact']['user_id'],
+					"first_name" => $jsonObj['contact']['first_name'],
+					"last_name"  => $jsonObj['contact']['last_name'],
+					"email"      => $jsonObj['contact']['email'],
+					"phone"      => $jsonObj['contact']['phone'],
+					"active"     => $jsonObj['contact']['active']
+				]
+			];
+		}else{
+			return [
+				'code'     => 400,
+				'status'   => 'fail',
+				'message'  => 'contact create fail',
+			    'contact' => null
+			];
+		}
 	}
 
 	public function findContactByEmail($email)
